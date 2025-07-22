@@ -49,8 +49,12 @@ public class InternalRegistrations {
 }
 package com.socgen.riskweb.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SubBookingEntity {
+    @JsonProperty("subBookingEntityId")
     private String subBookingId;
+    @JsonProperty("subBookingEntityName")
     private String subBookingName;
     private String country;
     private String createdDate;
