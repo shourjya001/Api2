@@ -4,7 +4,6 @@ import java.util.List;
 
 public class ResponseInternal {
     private List<InternalRegistrations> internalRegistrations;
-    private String registrationType; // To distinguish internal/external
 
     public List<InternalRegistrations> getInternalRegistrations() {
         return internalRegistrations;
@@ -13,17 +12,7 @@ public class ResponseInternal {
     public void setInternalRegistrations(List<InternalRegistrations> internalRegistrations) {
         this.internalRegistrations = internalRegistrations;
     }
-
-    public String getRegistrationType() {
-        return registrationType;
-    }
-
-    public void setRegistrationType(String registrationType) {
-        this.registrationType = registrationType;
-    }
 }
-
-
 package com.socgen.riskweb.Model;
 
 import org.springframework.data.annotation.Id;
@@ -31,8 +20,8 @@ import java.util.List;
 
 public class InternalRegistrations {
     @Id
-    private String bdrId; // Changed from entityId to bdrId
-    private List<SubBookingEntity> subBookings; // Changed from registrations to subBookings
+    private String bdrId;
+    private List<SubBookingEntity> subBookings;
 
     public String getBdrId() {
         return bdrId;
@@ -58,13 +47,11 @@ public class InternalRegistrations {
                 '}';
     }
 }
-
-
 package com.socgen.riskweb.Model;
 
 public class SubBookingEntity {
-    private String subBookingId; // Maps to subBookingEntityId
-    private String subBookingName; // Maps to subBookingEntityName
+    private String subBookingId;
+    private String subBookingName;
     private String country;
     private String createdDate;
 
