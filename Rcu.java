@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socgen.riskweb.Model.InternalRegistrations;
-import com.socgen.riskweb.Model.ResponseInternal;
+import com.socgen.riskweb.Model.ResponseInterior;
 import com.socgen.riskweb.beans.RiskwebclientProperties;
 import com.socgen.riskweb.dao.RiskwebClientDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class RestClientUtility {
         } catch (IOException e) {
             log.warning("GZIP decompression failed, trying Inflater: " + e.getMessage());
             try {
-                Inflater inflater = new Inflater(true);
+                Inflater inflater = new Inflater resize);
                 inflater.setInput(compressedBytes);
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream(compressedBytes.length);
                 byte[] buffer = new byte[1024];
@@ -73,7 +73,7 @@ public class RestClientUtility {
         }
     }
 
-    public ResponseInternal sendPrimaryroleApi(String endpoint, String apiType) throws IOException {
+    public ResponseInternal sendPrimaryroleApi() throws IOException {
         String scope = "api.get-third-parties.v1";
         String clientId = riskwebclientProperties.getMaestroClientId();
         String secretId = riskwebclientProperties.getMaestroSecretId();
@@ -81,10 +81,7 @@ public class RestClientUtility {
         ResponseInternal responseObject = new ResponseInternal();
 
         String maestroDate = "?snapshotDate=2025-02-15";
-        String baseUrl = riskwebclientProperties.getMaestrorelationshipApiUrl()
-                .replace("/internalRegistration", "")
-                .replace("/externalRegistration", "");
-        String endpointUrl = baseUrl + "/" + endpoint + maestroDate;
+        String endpointUrl = riskwebclientProperties.getMaestrorelationshipApiUrl() + maestroDate;
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -97,7 +94,7 @@ public class RestClientUtility {
 
         HttpEntity<String> entity = new HttpEntity<>("", headers);
 
-        log.info("Making API call to Maestro API for " + apiType + " at " + endpointUrl);
+        log.info("Making API call to Maestro API at " + endpointUrl);
 
         try {
             ResponseEntity<byte[]> result = restTemplate.exchange(
@@ -109,18 +106,18 @@ public class RestClientUtility {
 
             int status = result.getStatusCode().value();
             if (status != 200) {
-                String errorMessage = "API returned status code for " + apiType + ": " + status;
+                String errorMessage = "API returned status code: " + status;
                 log.error(errorMessage);
                 return null;
             }
 
-            log.info("Successfully received data from Maestro API for " + apiType);
+            log.info("Successfully received data from Maestro API");
 
             byte[] responseBody = result.getBody();
             String decompressedJson = decompressData(responseBody);
 
             if (decompressedJson == null) {
-                log.error("Failed to decompress or read the response data for " + apiType);
+                log.error("Failed to decompress or read the response data");
                 return null;
             }
 
@@ -145,22 +142,21 @@ public class RestClientUtility {
                 }
 
                 responseObject.setInternalRegistrations(processedRegistrations);
-                responseObject.setRegistrationType(apiType.toUpperCase());
 
                 try {
                     String jsonResponse = mapperObj.writeValueAsString(responseObject);
-                    log.info("Full API Response as JSON for " + apiType + ": " + jsonResponse);
+                    log.info("Full API Response as JSON: " + jsonResponse);
                 } catch (JsonProcessingException e) {
-                    log.error("Error converting response to JSON for " + apiType + ": " + e.getMessage());
+                    log.error("Error converting response to JSON: " + e.getMessage());
                 }
 
                 return responseObject;
             } catch (JsonProcessingException e) {
-                log.error("Error parsing JSON for " + apiType + ": " + e.getMessage());
+                log.error("Error parsing JSON: " + e.getMessage());
                 return null;
             }
         } catch (HttpClientErrorException e) {
-            log.error("HTTP error calling API for " + apiType + ": " + e.getMessage());
+            log.error("HTTP error calling API: " + e.getMessage());
             return null;
         }
     }
