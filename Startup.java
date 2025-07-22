@@ -24,18 +24,10 @@ public class RiskwebMaestroStartup {
         RiskwebMaestroStartup startup = context.getBean(RiskwebMaestroStartup.class);
 
         try {
-            // Process internal registrations
-            ResponseInternal internalResponse = startup.restClientUtility.sendPrimaryroleApi("internalRegistration", "INTERNAL");
-            if (internalResponse != null) {
-                LOGGER.info("Calling savePrimaryroleApi for internal registrations");
-                startup.clientDao.savePrimaryroleApi(internalResponse, "TMAESNUMIPL");
-            }
-
-            // Process external registrations
-            ResponseInternal externalResponse = startup.restClientUtility.sendPrimaryroleApi("externalRegistration", "EXTERNAL");
-            if (externalResponse != null) {
-                LOGGER.info("Calling savePrimaryroleApi for external registrations");
-                startup.clientDao.savePrimaryroleApi(externalResponse, "TMAESNUMIPL_EXTERNAL");
+            ResponseInternal response = startup.restClientUtility.sendPrimaryroleApi();
+            if (response != null) {
+                LOGGER.info("Calling savePrimaryroleApi for MAESTROPRC");
+                startup.clientDao.savePrimaryroleApi(response);
             }
         } catch (Exception e) {
             LOGGER.severe("Error: " + e.getMessage());
